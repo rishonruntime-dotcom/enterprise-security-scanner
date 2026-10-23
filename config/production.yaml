@@ -1,0 +1,8 @@
+environment: production
+app_name: Enterprise Scanner
+logging:
+  level: INFO
+  format: json
+scanner:
+  max_concurrency: 50
+  timeout_seconds: 600

@@ -1,0 +1,543 @@
+{
+    "Nginx": {
+        "category": "Web Server",
+        "website": "http://nginx.org",
+        "headers": {
+            "Server": "nginx(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "Apache": {
+        "category": "Web Server",
+        "website": "https://httpd.apache.org",
+        "headers": {
+            "Server": "Apache(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "IIS": {
+        "category": "Web Server",
+        "website": "https://www.iis.net",
+        "headers": {
+            "Server": "Microsoft-IIS(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "LiteSpeed": {
+        "category": "Web Server",
+        "website": "https://www.litespeedtech.com",
+        "headers": {
+            "Server": "LiteSpeed(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "Caddy": {
+        "category": "Web Server",
+        "website": "https://caddyserver.com",
+        "headers": {
+            "Server": "Caddy(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "Tomcat": {
+        "category": "Web Server",
+        "website": "https://tomcat.apache.org",
+        "headers": {
+            "Server": "Apache-Coyote(?:/([\\d.]+))?\\;version:\\1"
+        },
+        "html": [
+            "Apache Tomcat(?:/([\\d.]+))?\\;version:\\1"
+        ]
+    },
+    "Google Frontend": {
+        "category": "Web Server",
+        "website": "https://cloud.google.com",
+        "headers": {
+            "Server": "gws|gfe|sffe"
+        }
+    },
+    "Cloudflare": {
+        "category": "CDN & Proxy",
+        "website": "https://www.cloudflare.com",
+        "headers": {
+            "Server": "cloudflare(?:/([\\d.]+))?\\;version:\\1",
+            "CF-RAY": "",
+            "cf-cache-status": ""
+        },
+        "cookies": {
+            "cf_clearance": "",
+            "__cf_bm": ""
+        }
+    },
+    "Fastly": {
+        "category": "CDN & Proxy",
+        "website": "https://www.fastly.com",
+        "headers": {
+            "Server": "fastly(?:/([\\d.]+))?\\;version:\\1",
+            "X-Fastly-Request-ID": "",
+            "Fastly-Soft": ""
+        }
+    },
+    "Akamai": {
+        "category": "CDN & Proxy",
+        "website": "https://www.akamai.com",
+        "headers": {
+            "Server": "AkamaiGHost(?:/([\\d.]+))?\\;version:\\1",
+            "X-Akamai-Transformed": "",
+            "X-Akamai-Staging": "",
+            "X-Akamai-Session-Info": ""
+        }
+    },
+    "AWS": {
+        "category": "Cloud Platform",
+        "website": "https://aws.amazon.com",
+        "headers": {
+            "Server": "CloudFront(?:/([\\d.]+))?\\;version:\\1|AmazonS3(?:/([\\d.]+))?\\;version:\\2",
+            "X-Amz-Cf-Id": "",
+            "X-Amz-Request-Id": "",
+            "X-Amz-Bucket-Region": ""
+        },
+        "cookies": {
+            "AWSALB": "",
+            "AWSALBCORS": ""
+        }
+    },
+    "Azure": {
+        "category": "Cloud Platform",
+        "website": "https://azure.microsoft.com",
+        "headers": {
+            "Server": "Microsoft-IIS(?:/([\\d.]+))?\\;version:\\1",
+            "X-Azure-Ref": "",
+            "X-Azure-Websockets-Request-Guid": ""
+        },
+        "cookies": {
+            "ARRAffinity": "",
+            "ARRAffinitySameSite": ""
+        }
+    },
+    "GCP": {
+        "category": "Cloud Platform",
+        "website": "https://cloud.google.com",
+        "headers": {
+            "Server": "Google Frontend|gws|gfe|sffe",
+            "X-Cloud-Trace-Context": "",
+            "X-Goog-Signed": ""
+        }
+    },
+    "Vercel": {
+        "category": "Cloud Platform",
+        "website": "https://vercel.com",
+        "headers": {
+            "Server": "Vercel(?:/([\\d.]+))?\\;version:\\1",
+            "X-Vercel-Id": "",
+            "X-Vercel-Cache": ""
+        }
+    },
+    "Netlify": {
+        "category": "Cloud Platform",
+        "website": "https://www.netlify.com",
+        "headers": {
+            "Server": "Netlify(?:/([\\d.]+))?\\;version:\\1",
+            "X-NF-Request-ID": ""
+        }
+    },
+    "WAF": {
+        "category": "Security",
+        "website": "https://en.wikipedia.org/wiki/Web_application_firewall",
+        "headers": {
+            "Server": "cloudflare|akamai|fastly|imperva|sucuri|f5-big-ip|barracuda",
+            "X-CDN": "",
+            "X-Cache": "",
+            "X-Sucuri-Cache": "",
+            "X-CDN-POP": ""
+        },
+        "cookies": {
+            "incap_ses": "",
+            "visid_incap": "",
+            "_gat": ""
+        }
+    },
+    "WordPress": {
+        "category": "CMS",
+        "website": "https://wordpress.org",
+        "meta": {
+            "generator": "WordPress(?:\\s([\\d.]+))?\\;version:\\1"
+        },
+        "html": [
+            "wp-content",
+            "wp-includes",
+            "wp-json",
+            "wp-embed\\.js",
+            "/wp-admin/"
+        ],
+        "implies": ["PHP", "MySQL"]
+    },
+    "Drupal": {
+        "category": "CMS",
+        "website": "https://www.drupal.org",
+        "meta": {
+            "generator": "Drupal(?:\\s([\\d.]+))?\\;version:\\1"
+        },
+        "headers": {
+            "X-Generator": "Drupal(?:\\s([\\d.]+))?\\;version:\\1",
+            "X-Drupal-Cache": ""
+        },
+        "html": [
+            "Drupal\\.settings",
+            "sites/default/files"
+        ],
+        "implies": ["PHP"]
+    },
+    "Django": {
+        "category": "Web Framework",
+        "website": "https://www.djangoproject.com",
+        "headers": {
+            "Server": "WSGIServer(?:/([\\d.]+))?\\;version:\\1",
+            "X-Frame-Options": "DENY|SAMEORIGIN"
+        },
+        "html": [
+            "csrfmiddlewaretoken",
+            "__admin__",
+            "django\\.js",
+            "django-admin"
+        ],
+        "cookies": {
+            "csrftoken": "",
+            "sessionid": ""
+        },
+        "implies": ["Python"]
+    },
+    "Flask": {
+        "category": "Web Framework",
+        "website": "https://flask.palletsprojects.com",
+        "headers": {
+            "Server": "Werkzeug(?:/([\\d.]+))?\\;version:\\1"
+        },
+        "html": [
+            "werkzeug"
+        ],
+        "implies": ["Python", "Jinja"]
+    },
+    "Laravel": {
+        "category": "Web Framework",
+        "website": "https://laravel.com",
+        "headers": {
+            "X-Laravel": ""
+        },
+        "cookies": {
+            "laravel_session": "",
+            "XSRF-TOKEN": ""
+        },
+        "html": [
+            "laravel\\.js",
+            "mix\\.js"
+        ],
+        "implies": ["PHP"]
+    },
+    "Ruby": {
+        "category": "Programming Language",
+        "website": "https://ruby-lang.org",
+        "headers": {
+            "X-Powered-By": "Ruby(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "Rails": {
+        "category": "Web Framework",
+        "website": "https://rubyonrails.org",
+        "headers": {
+            "X-Rails-Version": "([\\d.]+)\\;version:\\1",
+            "X-Powered-By": "Rails(?:\\s([\\d.]+))?\\;version:\\1"
+        },
+        "html": [
+            "rails\\.js",
+            "rails-ujs",
+            "data-remote=true",
+            "csrf-token"
+        ],
+        "cookies": {
+            "_rails_session": ""
+        },
+        "implies": ["Ruby"]
+    },
+    "ASP.NET": {
+        "category": "Web Framework",
+        "website": "https://dotnet.microsoft.com/apps/aspnet",
+        "headers": {
+            "X-Powered-By": "ASP\\.NET",
+            "X-AspNet-Version": "([\\d.]+)\\;version:\\1",
+            "X-AspNetMvc-Version": "([\\d.]+)\\;version:\\1"
+        },
+        "cookies": {
+            "ASPSESSIONID": "",
+            "ASP.NET_SessionId": ""
+        },
+        "html": [
+            "__VIEWSTATE",
+            "__EVENTVALIDATION"
+        ]
+    },
+    "Spring Boot": {
+        "category": "Web Framework",
+        "website": "https://spring.io/projects/spring-boot",
+        "headers": {
+            "Server": "Apache-Coyote(?:/([\\d.]+))?\\;version:\\1"
+        },
+        "html": [
+            "spring\\.js",
+            "spring-security",
+            "Whitelabel Error Page"
+        ],
+        "cookies": {
+            "JSESSIONID": ""
+        },
+        "implies": ["Java"]
+    },
+    "Express": {
+        "category": "Web Framework",
+        "website": "https://expressjs.com",
+        "headers": {
+            "X-Powered-By": "Express"
+        },
+        "implies": ["Node.js"]
+    },
+    "React": {
+        "category": "JavaScript Framework",
+        "website": "https://reactjs.org",
+        "html": [
+            "data-reactroot",
+            "data-reactid",
+            "_react",
+            "react-dom"
+        ],
+        "script_src": [
+            "react(?:-dom)?(?:[\\.-]([\\d\\.]+))?\\.js\\;version:\\1",
+            "react\\.production\\.min\\.js"
+        ]
+    },
+    "Vue.js": {
+        "category": "JavaScript Framework",
+        "website": "https://vuejs.org",
+        "html": [
+            "data-v-",
+            "__VUE__",
+            "v-cloak"
+        ],
+        "script_src": [
+            "vue(?:\\.min)?\\.js",
+            "vue@[\\d\\.]+/(?:dist/)?vue(?:\\.min)?\\.js"
+        ]
+    },
+    "Angular": {
+        "category": "JavaScript Framework",
+        "website": "https://angular.io",
+        "html": [
+            "ng-version",
+            "ng-app",
+            "ng-controller",
+            "ng-binding"
+        ],
+        "script_src": [
+            "angular(?:[\\.-]([\\d\\.]+))?\\.js\\;version:\\1",
+            "main-es2015\\.[a-f0-9]+\\.js"
+        ]
+    },
+    "Svelte": {
+        "category": "JavaScript Framework",
+        "website": "https://svelte.dev",
+        "html": [
+            "svelte-[a-z0-9]+",
+            "__svelte",
+            "svelte-app"
+        ],
+        "script_src": [
+            "svelte(?:[\\.-]([\\d\\.]+))?\\.js\\;version:\\1"
+        ]
+    },
+    "Next.js": {
+        "category": "Web Framework",
+        "website": "https://nextjs.org",
+        "headers": {
+            "X-Nextjs-Page": "",
+            "X-Powered-By": "Next\\.js"
+        },
+        "html": [
+            "__NEXT_DATA__",
+            "_next/static"
+        ],
+        "script_src": [
+            "_next/static"
+        ],
+        "implies": ["React", "Node.js"]
+    },
+    "Nuxt.js": {
+        "category": "Web Framework",
+        "website": "https://nuxt.com",
+        "headers": {
+            "X-Powered-By": "Nuxt"
+        },
+        "html": [
+            "__NUXT__",
+            "_nuxt/"
+        ],
+        "script_src": [
+            "_nuxt/"
+        ],
+        "implies": ["Vue.js", "Node.js"]
+    },
+    "Astro": {
+        "category": "Web Framework",
+        "website": "https://astro.build",
+        "html": [
+            "astro-island",
+            "astro-ssr",
+            "data-astro-cid"
+        ],
+        "script_src": [
+            "_astro/"
+        ]
+    },
+    "PHP": {
+        "category": "Programming Language",
+        "website": "https://php.net",
+        "headers": {
+            "X-Powered-By": "PHP(?:/?([\\d.]+))?\\;version:\\1"
+        },
+        "cookies": {
+            "PHPSESSID": ""
+        }
+    },
+    "Node.js": {
+        "category": "Programming Language",
+        "website": "https://nodejs.org",
+        "headers": {
+            "X-Powered-By": "Node\\.js(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "Python": {
+        "category": "Programming Language",
+        "website": "https://python.org",
+        "headers": {
+            "Server": "Python/([\\d.]+)\\;version:\\1"
+        }
+    },
+    "Java": {
+        "category": "Programming Language",
+        "website": "https://java.com",
+        "headers": {
+            "Server": "Apache-Coyote(?:/([\\d.]+))?\\;version:\\1"
+        }
+    },
+    "Jinja": {
+        "category": "Template Engine",
+        "website": "https://jinja.palletsprojects.com",
+        "html": [
+            "jinja2"
+        ]
+    },
+    "GraphQL": {
+        "category": "API",
+        "website": "https://graphql.org",
+        "html": [
+            "graphql",
+            "__typename",
+            "graphql-playground",
+            "altair"
+        ],
+        "script_src": [
+            "graphql"
+        ]
+    },
+    "REST": {
+        "category": "API",
+        "website": "https://en.wikipedia.org/wiki/Representational_state_transfer",
+        "headers": {
+            "Allow": "GET, POST, PUT, DELETE, PATCH"
+        },
+        "html": [
+            "\\/api\\/v\\d+",
+            "\\/rest\\/",
+            "application\\/vnd\\.api\\+json"
+        ]
+    },
+    "SOAP": {
+        "category": "API",
+        "website": "https://en.wikipedia.org/wiki/SOAP",
+        "headers": {
+            "Content-Type": "text/xml|application/soap\\+xml"
+        },
+        "html": [
+            "soap:Envelope",
+            "soap:Body",
+            "\\?wsdl"
+        ]
+    },
+    "gRPC": {
+        "category": "API",
+        "website": "https://grpc.io",
+        "headers": {
+            "Content-Type": "application/grpc"
+        },
+        "html": [
+            "grpc-web",
+            "grpcui"
+        ]
+    },
+    "Brotli": {
+        "category": "Protocol & Encoding",
+        "website": "https://github.com/google/brotli",
+        "headers": {
+            "Content-Encoding": "br"
+        }
+    },
+    "HTTP/2": {
+        "category": "Protocol & Encoding",
+        "website": "https://http2.github.io",
+        "headers": {
+            "X-Firefox-Spdy": "h2",
+            "alt-svc": "h2"
+        }
+    },
+    "HTTP/3": {
+        "category": "Protocol & Encoding",
+        "website": "https://quicwg.org",
+        "headers": {
+            "alt-svc": "h3"
+        }
+    },
+    "Service Workers": {
+        "category": "Web Feature & API",
+        "website": "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API",
+        "html": [
+            "serviceWorker",
+            "navigator\\.serviceWorker",
+            "sw\\.js"
+        ],
+        "script_src": [
+            "sw\\.js",
+            "service-worker\\.js"
+        ]
+    },
+    "MySQL": {
+        "category": "Database",
+        "website": "https://www.mysql.com",
+        "cookies": {
+            "mysql": ""
+        }
+    },
+    "PostgreSQL": {
+        "category": "Database",
+        "website": "https://www.postgresql.org",
+        "cookies": {
+            "pgsql": ""
+        }
+    },
+    "MongoDB": {
+        "category": "Database",
+        "website": "https://www.mongodb.com",
+        "html": [
+            "mongodb"
+        ]
+    },
+    "Redis": {
+        "category": "Database",
+        "website": "https://redis.io",
+        "headers": {
+            "Server": "Redis(?:/([\\d.]+))?\\;version:\\1"
+        }
+    }
+}

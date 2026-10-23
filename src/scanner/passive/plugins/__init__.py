@@ -1,0 +1,3 @@
+"""
+Passive plugins collection.
+"""

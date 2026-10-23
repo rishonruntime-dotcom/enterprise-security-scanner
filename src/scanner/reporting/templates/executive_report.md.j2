@@ -1,0 +1,387 @@
+# Enterprise Security Scanner Report
+
+**Generated At:** {{ report.metadata.generated_at }}
+**Scanner Version:** {{ report.metadata.scanner_version }}
+**Targets:** 
+{% for target in report.metadata.target_urls %}
+- {{ target }}
+{% endfor %}
+
+---
+
+## Overall Security Score
+
+**Score:** {{ report.intelligence.overall_security_score }}/100
+**Assessment:** {{ report.intelligence.score_breakdown.get('rationale', 'Enterprise Security Posture Assessment') }}
+
+### How was {{ report.intelligence.overall_security_score }} calculated?
+
+{% set sb = report.intelligence.score_breakdown %}
+{% set rewards_total = (sb.get('initial_posture', 75.0) - sb.get('base_maturity', 75.0)) %}
+1. **Base Baseline Score:** `+{{ sb.get('base_maturity', 75.0) }} pts` (Enterprise standard baseline)
+2. **Positive Defensive Rewards:** `+{{ "%.1f"|format(rewards_total) }} pts` (Headers, HSTS, cookie security flags, HTTPS adoption)
+   - *Initial Defensive Posture:* **{{ sb.get('initial_posture', 75.0) }} / 100** (Capped at 100.0)
+3. **Raw Vulnerability Deductions:** `-{{ sb.get('raw_penalty', 0.0) }} pts` (Critical: -15, High: -8, Medium: -2.5, Low: -0.3)
+4. **Mitigation Dampening Credit:** `-{{ sb.get('mitigation_dampening_percent', 0) }}% penalty reduction` (Defensive headers dampening risk impact)
+   - *Adjusted Vulnerability Penalty:* **-{{ sb.get('adjusted_penalty', 0.0) }} pts** `[ = {{ sb.get('raw_penalty', 0.0) }} × (1 - {{ sb.get('mitigation_dampening_percent', 0) / 100.0 }}) ]`
+
+> **Formula:** `FINAL SECURITY SCORE = Initial Posture ({{ sb.get('initial_posture', 75.0) }}) - Adjusted Penalty ({{ sb.get('adjusted_penalty', 0.0) }})` = **{{ report.intelligence.overall_security_score }} / 100**
+
+### Defensive Controls & Positive Rewards
+| Defensive Control | Points | Evidence / Rationale |
+|---|---|---|
+| **Baseline Maturity** | +{{ report.intelligence.score_breakdown.get('base_maturity', 75.0) }} | Enterprise baseline posture |
+{% for reward in report.intelligence.score_breakdown.get('positive_rewards', []) %}
+| **{{ reward.control }}** | +{{ reward.points }} | {{ reward.reason }} |
+{% endfor %}
+
+{% if report.intelligence.score_breakdown and report.intelligence.score_breakdown.get('vulnerability_penalties') %}
+### Vulnerability Deductions
+| Severity Tier | Count | Deduction |
+|---|---|---|
+{% for pen in report.intelligence.score_breakdown.get('vulnerability_penalties', []) %}
+| **{{ pen.severity }}** | {{ pen.count }} | -{{ pen.penalty }} pts |
+{% endfor %}
+
+*Mitigation Dampening Active:* **{{ report.intelligence.score_breakdown.get('mitigation_dampening_percent', 0) }}% penalty dampening applied due to active defensive controls.**
+{% endif %}
+
+---
+
+## Attack Surface Summary
+
+- **Total Endpoints:** {{ report.intelligence.attack_surface_summary.total_endpoints }}
+- **Total Forms:** {{ report.intelligence.attack_surface_summary.total_forms }}
+- **Total Parameters:** {{ report.intelligence.attack_surface_summary.total_parameters }}
+- **Total Pages:** {{ report.intelligence.attack_surface_summary.total_pages }}
+- **Browser Routes:** {{ report.intelligence.attack_surface_summary.browser_routes }}
+- **Targets:** {{ report.intelligence.attack_surface_summary.targets }}
+
+---
+
+## Risk Trend
+
+| Time | Findings | Severity Score |
+|------|----------|----------------|
+{% for point in report.intelligence.risk_trend %}
+| {{ point.time }} | {{ point.findings }} | {{ point.severity_score }} |
+{% endfor %}
+
+---
+
+## Most Critical Assets
+
+| Asset URL | Findings | Critical | High | Risk Score |
+|-----------|----------|----------|------|------------|
+{% for asset in report.intelligence.most_critical_assets %}
+| {{ asset.target_url }} | {{ asset.finding_count }} | {{ asset.critical_count }} | {{ asset.high_count }} | {{ asset.risk_score }} |
+{% endfor %}
+
+---
+
+## Executive Recommendations
+
+{% for rec in report.intelligence.executive_recommendations %}
+- {{ rec }}
+{% endfor %}
+
+---
+
+## Confidence Distribution
+
+- **High Confidence:** {{ report.intelligence.confidence_distribution.get('High', 0) }}
+- **Medium Confidence:** {{ report.intelligence.confidence_distribution.get('Medium', 0) }}
+- **Low Confidence:** {{ report.intelligence.confidence_distribution.get('Low', 0) }}
+
+---
+
+## Verified vs Unverified Findings
+
+- **Verified:** {{ report.intelligence.verified_vs_unverified.get('verified', 0) }}
+- **Unverified:** {{ report.intelligence.verified_vs_unverified.get('unverified', 0) }}
+- **Estimated False Positive Probability:** {{ report.summary.false_positive_probability }}%
+
+---
+
+## Findings by Asset
+
+| Asset URL | Findings | Top Severities |
+|-----------|----------|----------------|
+{% for asset in report.intelligence.findings_by_asset %}
+| {{ asset.asset_url }} | {{ asset.findings | length }} | Critical: {{ asset.findings | selectattr('severity', 'equalto', 'Critical') | list | length }}, High: {{ asset.findings | selectattr('severity', 'equalto', 'High') | list | length }}, Medium: {{ asset.findings | selectattr('severity', 'equalto', 'Medium') | list | length }} |
+{% endfor %}
+
+---
+
+## Findings by Asset Category
+
+| Asset Category | Findings | Severity Breakdown |
+|----------------|----------|--------------------|
+{% for cat in report.intelligence.findings_by_asset_category %}
+| {{ cat.asset_category }} | {{ cat.findings | length }} | Critical: {{ cat.findings | selectattr('severity', 'equalto', 'Critical') | list | length }}, High: {{ cat.findings | selectattr('severity', 'equalto', 'High') | list | length }}, Medium: {{ cat.findings | selectattr('severity', 'equalto', 'Medium') | list | length }} |
+{% endfor %}
+
+---
+
+## Discovery Quality Metrics
+
+- **Crawl Coverage:** {{ report.intelligence.discovery_quality.crawl_coverage_percent }}%
+- **Forms Discovered:** {{ report.intelligence.discovery_quality.forms_discovered }}
+- **APIs Discovered:** {{ report.intelligence.discovery_quality.apis_discovered }}
+- **JavaScript Files Analyzed:** {{ report.intelligence.discovery_quality.javascript_files_analyzed }}
+- **Hidden Endpoints:** {{ report.intelligence.discovery_quality.hidden_endpoints }}
+- **Assets Skipped:** {{ report.intelligence.discovery_quality.assets_skipped }}
+- **Third-Party Assets:** {{ report.intelligence.discovery_quality.third_party_assets }}
+- **Total Assets:** {{ report.intelligence.discovery_quality.total_assets }}
+
+### Endpoint Types
+
+| Endpoint Type | Count |
+|---------------|-------|
+{% for type_name, type_count in report.intelligence.discovery_quality.endpoint_types.items() %}
+| {{ type_name }} | {{ type_count }} |
+{% endfor %}
+
+---
+
+## Network Exposure Analysis
+
+{% if report.intelligence.network_exposure and (report.intelligence.network_exposure.open_ports_count > 0 or report.intelligence.network_exposure.open_ports) %}
+{% set ne = report.intelligence.network_exposure %}
+### Exposure Summary
+
+- **Target Host:** {{ ne.target_host }}
+- **Total Ports Scanned:** {{ ne.total_ports_scanned }}
+- **Open Ports:** {{ ne.open_ports_count }}
+- **Filtered Ports:** {{ ne.filtered_ports_count }}
+- **Closed Ports:** {{ ne.closed_ports_count }}
+- **Risky Services:** {{ ne.risky_services_count }}
+- **Overall Exposure Risk:** {{ ne.exposure_summary.overall_exposure_risk if ne.exposure_summary else 'Info' }}
+- **Scan Duration:** {{ "%.2f"|format(ne.scan_duration_seconds) }}s
+
+### Open Services & Risk Level
+
+| Port | Protocol | Service | Category | Risk Level | Product / Vendor |
+|------|----------|---------|----------|------------|------------------|
+{% for p in ne.open_ports %}
+| {{ p.port }} | {{ p.protocol }} | {{ p.service or 'Unknown' }} | {{ p.category or 'Infrastructure' }} | {{ p.risk_level or ('High' if p.port in [21, 23, 445, 3306, 3389, 5432, 6379, 27017, 2375, 6443] else 'Info') }} | {{ p.product or 'N/A' }} |
+{% endfor %}
+
+### Software Fingerprinting & Version Details
+
+| Port | Service | Product | Version | Vendor | Banner |
+|------|---------|---------|---------|--------|--------|
+{% for p in ne.open_ports %}
+| {{ p.port }} | {{ p.service or 'N/A' }} | {{ p.product or 'N/A' }} | {{ p.version or 'N/A' }} | {{ p.vendor or 'Generic' }} | {{ p.banner or 'No banner' }} |
+{% endfor %}
+
+### TLS Configuration & Certificates
+
+| Port | Service | TLS Version | Certificate Issuer | Expiry Date | Self-Signed | ALPN |
+|------|---------|-------------|-------------------|-------------|-------------|------|
+{% for p in ne.open_ports %}
+| {{ p.port }} | {{ p.service or 'N/A' }} | {{ p.tls_version or ('Supported' if p.tls_support else 'None') }} | {{ p.certificate_issuer or 'N/A' }} | {{ p.expiration_date or 'N/A' }} | {{ 'Yes' if p.self_signed else 'No' }} | {{ (p.alpn_protocols|join(', ')) if p.alpn_protocols else 'HTTP/1.1' }} |
+{% endfor %}
+
+### HTTP Engine & Edge Infrastructure (CDN / WAF / Proxy)
+
+| Port | HTTP Version | Server Software | Reverse Proxy / Load Balancer | CDN Provider | WAF Status |
+|------|--------------|-----------------|-------------------------------|--------------|------------|
+{% for p in ne.open_ports %}
+| {{ p.port }} | {{ p.http_version or 'N/A' }} | {{ p.server_software or p.product or 'N/A' }} | {{ p.reverse_proxy or 'None' }} | {{ p.cdn or 'None' }} | {{ p.waf_name or 'None' }} |
+{% endfor %}
+
+### Recommendations & Evidence
+
+{% for p in ne.open_ports %}
+- **Port {{ p.port }} ({{ p.service or 'Unknown' }})**:
+  - **Evidence**: {{ (p.checks|join(', ')) if p.checks else 'TCP handshake' }}
+  - **Banner**: `{{ p.banner or 'None' }}`
+  - **Recommendation**: Restrict access to port {{ p.port }} using network firewalls or VPN. Enforce strong authentication.
+{% endfor %}
+
+{% else %}
+No supported open services or exposed network endpoints were identified during authorized exposure analysis.
+{% endif %}
+
+---
+
+## Technology Inventory
+
+{% if report.technologies %}
+| Technology | Category | Version / Vendor | Detection Source | Confidence & Reason | Evidence Hits | Primary Endpoint (Observed On) |
+|------------|----------|------------------|------------------|---------------------|---------------|--------------------------------|
+{% for tech in report.technologies %}
+| {{ tech.name }} | {{ tech.category }} | {{ tech.version }}{% if tech.vendor and tech.vendor != 'Generic' %} ({{ tech.vendor }}){% endif %} | {{ tech.detection_source or 'Passive' }} | {{ "%.0f"|format((tech.confidence * 100) if tech.confidence <= 1.0 else tech.confidence) }}% - {{ tech.confidence_reason or 'Pattern matched' }} | {{ tech.evidence_count or tech.detected_on_endpoints or 1 }} | {{ tech.observed_on or tech.target_url or 'Root Endpoint' }} |
+{% endfor %}
+{% else %}
+No technologies detected.
+{% endif %}
+---
+
+## False Positive Engine Decision Transparency Audit
+
+{% set fp_audit = report.intelligence.fp_engine_decisions %}
+- **Rejected Findings:** {{ fp_audit.get('rejected_count', 0) }}
+- **Suppressed Findings:** {{ fp_audit.get('suppressed_count', 0) }}
+- **Confidence Penalties Applied:** {{ fp_audit.get('confidence_penalties_applied', 0) }}
+- **Merged Findings:** {{ fp_audit.get('merged_count', 0) }}
+
+{% if fp_audit.get('rejected_findings') %}
+### Rejected Findings (Reason Removed)
+
+| Finding Title | Endpoint | Original Severity | Reason Removed |
+|---------------|----------|-------------------|----------------|
+{% for rf in fp_audit.get('rejected_findings') %}
+| {{ rf.title }} | `{{ rf.endpoint }}` | {{ rf.original_severity or 'Info' }} | {{ rf.reason_removed }} |
+{% endfor %}
+{% endif %}
+
+{% if fp_audit.get('suppressed_findings') %}
+### Suppressed & Downgraded Findings (Reason Suppressed)
+
+| Finding Title | Endpoint | Original Severity | Final Severity | Reason Suppressed |
+|---------------|----------|-------------------|----------------|-------------------|
+{% for sf in fp_audit.get('suppressed_findings') %}
+| {{ sf.title }} | `{{ sf.endpoint }}` | {{ sf.original_severity }} | {{ sf.suppressed_severity }} | {{ sf.reason_suppressed }} |
+{% endfor %}
+{% endif %}
+
+{% if fp_audit.get('confidence_penalties') %}
+### Confidence Penalties Applied (Penalty Rationale)
+
+| Finding Title | Endpoint | Base Conf. | Final Conf. | Penalty | Penalty Rationale |
+|---------------|----------|------------|-------------|---------|-------------------|
+{% for cp in fp_audit.get('confidence_penalties') %}
+| {{ cp.title }} | `{{ cp.endpoint }}` | {{ cp.base_confidence }} | {{ cp.adjusted_confidence }} | {{ cp.penalty_amount }} | {{ cp.penalty_rationale }} |
+{% endfor %}
+{% endif %}
+
+{% if fp_audit.get('merged_findings') %}
+### Merged & Deduplicated Findings (Reason Merged)
+
+| Primary Finding Title | Category | Endpoints Merged | Primary Endpoint | Reason Merged |
+|-----------------------|----------|------------------|------------------|---------------|
+{% for mf in fp_audit.get('merged_findings') %}
+| {{ mf.title }} | {{ mf.category }} | {{ mf.endpoints_merged_count }} | `{{ mf.primary_endpoint }}` | {{ mf.reason_merged }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Executive Attack Chain Analysis & Threat Vectors
+
+The following multi-step attack chains demonstrate how individually low-or-medium severity vulnerabilities correlate to produce high-impact exploit paths:
+
+{% if report.intelligence.attack_chains %}
+{% for chain in report.intelligence.attack_chains %}
+### {{ chain.chain_id }}: {{ chain.title }}
+
+- **Impact Level:** {{ chain.impact_level }} Impact
+- **Final Impact:** {{ chain.final_impact }}
+- **Exploitation Likelihood:** {{ chain.likelihood }}
+
+#### Visual Exploit Chain Flow
+`{% for step in chain.steps %}Step {{ step.step_number }}: {{ step.vulnerability_type }}{% if not loop.last %} ➔ {% endif %}{% endfor %} ⇒ FINAL IMPACT: {{ chain.final_impact }}`
+
+{% if chain.causal_edges %}
+#### Technical Causal Edges & Mechanisms
+
+| Edge ID | Source Finding | Causal Relationship | Technical Mechanism | Destination Finding |
+|---------|----------------|---------------------|---------------------|---------------------|
+{% for edge in chain.causal_edges %}
+| {{ edge.edge_id }} | **{{ edge.source_finding.title }}** (`{{ edge.source_finding.endpoint }}`) | {{ edge.causal_relationship }} | {{ edge.technical_mechanism }} | **{{ edge.destination_finding.title }}** (`{{ edge.destination_finding.endpoint }}`) |
+{% endfor %}
+{% endif %}
+
+#### Exploit Chain Steps
+
+| Step # | Vulnerability Stage | Target Endpoint | Role in Exploit Chain |
+|--------|---------------------|-----------------|-----------------------|
+{% for step in chain.steps %}
+| Step {{ step.step_number }} | **{{ step.title }}** | `{{ step.endpoint }}` | {{ step.role_in_chain }} |
+{% endfor %}
+
+- **Exploitation Outcome:** {{ chain.outcome }}
+- **Remediation Strategy:** {{ chain.remediation_strategy }}
+
+{% endfor %}
+{% else %}
+No multi-step exploitable attack chains were identified across target endpoints.
+{% endif %}
+
+---
+
+## Findings by Technology
+
+| Technology | Findings | Severity Breakdown |
+|------------|----------|-------------------|
+{% for tech in report.intelligence.findings_by_technology %}
+| {{ tech.technology_name }} | {{ tech.findings | length }} | Critical: {{ tech.findings | selectattr('severity', 'equalto', 'Critical') | list | length }}, High: {{ tech.findings | selectattr('severity', 'equalto', 'High') | list | length }}, Medium: {{ tech.findings | selectattr('severity', 'equalto', 'Medium') | list | length }} |
+{% endfor %}
+
+---
+
+## Scan Summary
+
+- **Total Findings:** {{ report.summary.total_findings }}
+- **Critical:** {{ report.summary.critical_count }}
+- **High:** {{ report.summary.high_count }}
+- **Medium:** {{ report.summary.medium_count }}
+- **Low:** {{ report.summary.low_count }}
+- **Info:** {{ report.summary.info_count }}
+
+---
+
+## Detailed Findings
+
+{% for finding in report.findings %}
+### [{{ finding.severity.value }}] {{ finding.title }}
+**Endpoint:** `{{ finding.endpoint }}`
+**Endpoint Class:** {{ finding.endpoint_class or 'Main Application' }}
+**Asset Category:** {{ finding.asset_category or 'First-party' }}
+{% if finding.affected_endpoints|length > 1 %}
+**Affected Endpoints ({{ finding.affected_endpoints|length }}):**
+{% for endpoint in finding.affected_endpoints %}
+- `{{ endpoint }}`
+{% endfor %}
+{% endif %}
+**Priority Score:** {{ finding.risk.final_priority if finding.risk else 'N/A' }}
+**CVSS Base Score:** {{ finding.cvss_score if finding.cvss_score is defined and finding.cvss_score is not none else (finding.risk.cvss.base_score if (finding.risk and finding.risk.cvss) else '0.0') }}
+**CVSS Vector:** `{{ finding.cvss_vector if (finding.cvss_vector and finding.cvss_vector != 'N/A') else (finding.intelligence.cvss_vector if (finding.intelligence and finding.intelligence.cvss_vector) else (finding.risk.cvss.vector if (finding.risk and finding.risk.cvss) else 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N')) }}`
+**CWE:** {{ finding.intelligence.cwe_id if finding.intelligence else 'N/A' }}
+
+{{ finding.description }}
+
+{% if finding.why_detected or finding.how_verified or finding.severity_reason or finding.false_positive_reasons %}
+#### Scanner Explainability
+{% if finding.why_detected %}
+- **Why Detected:** {{ finding.why_detected }}
+{% endif %}
+{% if finding.how_verified %}
+- **How Verified:** {{ finding.how_verified }}
+{% endif %}
+{% if finding.severity_reason %}
+- **Why Severity Assigned:** {{ finding.severity_reason }}
+{% endif %}
+{% if finding.false_positive_reasons %}
+- **Possible False-Positive Reasons:**
+{% for reason in finding.false_positive_reasons %}
+  - {{ reason }}
+{% endfor %}
+{% endif %}
+
+{% endif %}
+
+{% if finding.evidence %}
+#### Evidence
+{% for item in finding.evidence %}
+**{{ item.type }}** - {{ item.description }}
+```
+{{ item.data }}
+```
+{% endfor %}
+{% endif %}
+
+---
+{% endfor %}
